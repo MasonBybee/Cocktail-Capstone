@@ -1,0 +1,39 @@
+{% extends 'base.html' %} {% block title %} {{cocktail.strDrink}} {% endblock %}
+{% block content %}
+<h1 class="display-1 text-center">{{cocktail.strDrink}}</h1>
+<img
+  class="mt-5 rounded mx-auto d-block cocktailImg"
+  src="{{cocktail.strDrinkThumb}}"
+  alt="Picture of {{cocktail.strDrink}}"
+/>
+<h2 class="mt-5 display-3 text-center">Ingredients</h2>
+<div class="mt-5 container d-flex justify-content-evenly flex-wrap">
+  {% for ingredient, measure in ingredients.items() %}
+
+  <a class="text-decoration-none" href="/ingredients/{{ingredient}}"
+    ><div class="card m-3 customCard" style="width: 18rem">
+      <div class="card-body">
+        <h5 class="card-title text-center">{{ingredient}}</h5>
+        <p class="card-text text-center">{{measure}}</p>
+      </div>
+    </div>
+  </a>
+
+  {% endfor %}
+</div>
+<h2 class="m-3 display-3 text-center">Instructions</h2>
+<div class="mt-5 contianer d-flex justify-content-center">
+  <p class="cocktailInstructions text-center">
+    {{cocktail.strInstructions | safe}}
+  </p>
+</div>
+<div class="cocktailComments container">
+  {% for comment in comments %}
+  <h2 class="m-3 display-3 text-center">Comments</h2>
+  <div class="card">
+    <h5 class="card-title">{{comment.user.username}}</h5>
+    <p class="card-text">{{comment.comment}}</p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

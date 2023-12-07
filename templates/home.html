@@ -1,0 +1,15 @@
+{% extends 'base.html' %} {% block title %} Home {% endblock %} {% block content
+%}
+<h1 class="display-1 mt-5 text-center">Welcome to Pour & Explore</h1>
+<div class="SeachDiv">
+  <input
+    type="text"
+    class="homeSearch"
+    placeholder="Search for a Cocktail or an Ingredient!"
+  />
+  <i class="fa-solid fa-magnifying-glass searchIcon hidden"></i>
+</div>
+<div
+  class="resultContainer container d-flex justify-content-evenly flex-wrap"
+></div>
+{% endblock%}

@@ -1,0 +1,37 @@
+{% extends 'base.html' %} {% block title %} {{ingredient.strIngredient}} {%
+endblock%} {% block content %}
+<h1 class="display-1 text-center">{{ingredient.strIngredient}}</h1>
+<h4 class="display-5 text-center smaller">
+  Ingredient Type: {{ingredient.strType}}
+</h4>
+<div class="container d-flex justify-content-center">
+  <img
+    class="my-4"
+    src="https://www.thecocktaildb.com/images/ingredients/{{ingredient.strIngredient}}-medium.png"
+    alt="{{ingredient.strIngredient}}"
+  />
+</div>
+<h3 class="display-5 text-center">Description</h3>
+<div class="container">
+  <p class="text-center">{{ingredient.strDescription}}</p>
+</div>
+
+<div class="container d-flex justify-content-evenly flex-wrap">
+  {% for cocktail in cocktails%}
+  <a
+    class="text-decoration-none d-table-cell"
+    href="/cocktails/{{cocktail.idDrink}}"
+    ><div class="cocktailCard card m-3 customCard" style="width: 18rem">
+      <img
+        class="card-img-top"
+        src="{{cocktail.strDrinkThumb}}"
+        alt="Card image cap"
+      />
+      <div class="cocktailCard card-body">
+        <h5 class="cocktailTitle card-title">{{cocktail.strDrink}}</h5>
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}
