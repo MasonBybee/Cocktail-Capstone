@@ -1,0 +1,99 @@
+body {
+  background-color: #4a4a4a;
+  color: #cccccc;
+}
+
+.custom-btn {
+  width: 100%;
+  display: block;
+}
+
+.cocktailCard {
+  background-color: rgba(red, green, rgb(0, 0, 0), 0.6) !important;
+}
+
+.cocktailTitle {
+  text-decoration: none;
+}
+
+.cocktailImg {
+  width: 15%;
+  height: auto;
+}
+
+.cocktailInstructions {
+  width: 500px;
+}
+
+.navLine {
+  background-color: #cccccc;
+  height: 1px;
+  width: 100%;
+}
+
+.customCard {
+  color: #cccccc;
+  background-color: #212529;
+  width: auto;
+  border: 2px solid #212529;
+  transition: 200ms;
+}
+
+.customCard:hover {
+  color: #212529;
+  background-color: #cccccc;
+}
+
+.ingredientDescription {
+  position: absolute;
+  text-align: center;
+  left: 50%;
+  transform: translate(-50%);
+  width: 60%;
+}
+
+.smaller {
+  font-size: 2rem;
+}
+
+.contentContainer {
+  padding-top: 56px;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.homeSearch::placeholder {
+  text-align: center;
+}
+
+.SeachDiv {
+  margin-top: 40px;
+  display: block;
+  position: relative;
+  width: 60vh;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%);
+  border-radius: 13px;
+}
+
+.homeSearch {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 35px;
+  top: 50%;
+  transform: translate(0, -50%);
+  border: 2px solid #212529;
+  border-radius: 15px;
+}
+
+.searchIcon {
+  position: relative;
+  left: 15px;
+  top: 5px;
+}
+.hidden {
+  visibility: hidden;
+}
