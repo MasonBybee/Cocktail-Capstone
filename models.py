@@ -6,11 +6,16 @@ bcrypt = Bcrypt()
 db = SQLAlchemy()
 
 
+def connect_db(app):
+    db.app = app
+    db.init_app(app)
+
+
 class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.Text(20), nullable=False)
+    username = db.Column(db.String(20), nullable=False)
     password = db.Column(db.Text, nullable=False)
     email = db.Column(db.Text, nullable=False)
 
@@ -31,13 +36,13 @@ class User(db.Model):
 
         hashed_pwd = bcrypt.generate_password_hash(password).decode("UTF-8")
 
-        user = User(username=username, email=email, password=hashed_pwd)
+        user = User(username=username, password=hashed_pwd, email=email)
         db.session.add(user)
         return user
 
     @classmethod
     def authenticate(cls, username, password):
-        user = cls.query.filter_by(username=username).first
+        user = cls.query.filter_by(username=username).first()
 
         if user:
             is_auth = bcrypt.check_password_hash(user.password, password)
@@ -55,6 +60,7 @@ class Comments(db.Model):
     cocktail_id = db.Column(db.Integer, nullable=False)
     dateCreated = db.Column(db.Text, nullable=False)
     dateUpdated = db.Column(db.Text, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
 
     def __repr__(self):
         return f"<Comment #{self.id}>"
