@@ -13,7 +13,11 @@ content %}
         alt="Card image cap"
       />
       <div class="cocktailCard card-body">
-        <h5 class="cocktailTitle card-title">{{cocktail.strDrink}}</h5>
+        <h5 class="cocktailTitle card-title">
+          {% if user and cocktail.idDrink in favorites %}
+          <i class="fa-solid fa-star"></i>
+          {% endif %}{{cocktail.strDrink}}
+        </h5>
       </div>
     </div>
   </a>
