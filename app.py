@@ -2,10 +2,15 @@ from flask import Flask, render_template, request, flash, redirect, session, g, 
 from models import db, connect_db, User, UserFeedback, Comments
 from forms import NewUserForm, LoginUserForm
 import requests
-from secret import apiKey
 from sqlalchemy.orm.exc import NoResultFound
-import json
 from datetime import datetime
+import os
+
+from dotenv import load_dotenv
+
+
+load_dotenv()
+apiKey = os.getenv("apiKey")
 
 CURR_USER_ID = "curr_user"
 
