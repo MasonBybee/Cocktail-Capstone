@@ -2,9 +2,12 @@
 <html lang="en">
   <head>
     <link
-      rel="icon"
-      href="https://img.freepik.com/premium-vector/martini-cocktail-with-umbrella-olive-classic-glass-black-white-vector-icon-isolated-white-background-glyph-is-symbol-alcoholic-beverage_439591-552.jpg"
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+      integrity="sha512-zN4oBRiLFFWsR9V0wW9R8JS05MO9OrZm30QK5yT2u1bNm+ShAqk5W9d3BPZiN2LUzF6LgtzgE3+g2tMDMyq2omQ=="
+      crossorigin="anonymous"
     />
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
@@ -24,36 +27,42 @@
         <li class="nav-item">
           <a href="/cocktails" class="nav-link">Popular Cocktails</a>
         </li>
+        {% if user_id %}
+        <li class="nav-item">
+          <a href="/user/favorites" class="nav-link">Your Favorites</a>
+        </li>
+        {% endif %}
       </ul>
 
       <div class="ml-auto">
         <ul class="navbar-nav">
           {% if user_id %}
           <li class="nav-item">
-            <a href="/logout" class="nav-link">Logout</a>
+            <a href="/user/logout" class="nav-link">Logout</a>
           </li>
           <div class="navBreak"></div>
           {% else %}
           <li class="nav-item">
-            <a href="/signup" class="nav-link">Signup</a>
+            <a href="/user/signup" class="nav-link">Signup</a>
           </li>
           <li class="nav-item">
-            <a href="/login" class="nav-link">Login</a>
+            <a href="/user/login" class="nav-link">Login</a>
           </li>
           {% endif %}
         </ul>
       </div>
     </nav>
-    <div class="navLine"></div>
 
-    <div class="contianer">
-      {% for category, msg in get_flashed_messages(with_categories=true)%}
-      <div class="card bg-{{category}} d-flex justify-content-center">
-        <div class="card-body">{{msg}}</div>
+    <div class="contentContainer">
+      <div class="contianer">
+        {% for category, msg in get_flashed_messages(with_categories=true)%}
+        <div class="card bg-{{category}} d-flex justify-content-center">
+          <div class="card-body flashedMessage">{{msg}}</div>
+        </div>
+        {% endfor %}
       </div>
-      {% endfor %}
+      {% block content %} {% endblock %}
     </div>
-    <div class="contentContainer">{% block content %} {% endblock %}</div>
     <footer>
       <a href=""></a>
     </footer>
@@ -63,7 +72,7 @@
       integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
       crossorigin="anonymous"
     ></script>
-    <script src="/static/index.js"></script>
+    {% block scripts %} {% endblock %}
     <script
       src="https://kit.fontawesome.com/a425a78511.js"
       crossorigin="anonymous"
