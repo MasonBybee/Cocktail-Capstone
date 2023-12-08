@@ -2,7 +2,13 @@ body {
   background-color: #4a4a4a;
   color: #cccccc;
 }
+nav {
+  border-bottom: 1px solid #cccccc;
+}
 
+.flashedMessage {
+  color: #cccccc;
+}
 .custom-btn {
   width: 100%;
   display: block;
@@ -23,12 +29,6 @@ body {
 
 .cocktailInstructions {
   width: 500px;
-}
-
-.navLine {
-  background-color: #cccccc;
-  height: 1px;
-  width: 100%;
 }
 
 .customCard {
@@ -96,4 +96,33 @@ body {
 }
 .hidden {
   visibility: hidden;
+}
+
+.reactionContainer {
+  margin-top: 20px;
+  width: 15%;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+}
+
+.reactionForm {
+  display: inline-block;
+}
+
+.reactionButton {
+  width: 50px;
+  height: 50px;
+  border: none;
+  color: #cccccc;
+  background-color: #212529;
+  border-radius: 10px;
+  transition: all 200ms;
+}
+
+.reactionButton:hover {
+  transition: all 200ms;
+  color: #212529;
+  background-color: #cccccc;
+  border: 1px solid #212529;
 }
