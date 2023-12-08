@@ -1,0 +1,24 @@
+{% extends 'base.html' %} {% block title %} {{user.username}}'s Favorite
+Cocktails {% endblock %} {% block content %}
+<h1 class="display-2 text-center m-4">Favorited Cocktails</h1>
+<div class="container d-flex justify-content-evenly flex-wrap">
+  {% for cocktail in cocktails%}
+  <a
+    class="text-decoration-none d-table-cell"
+    href="/cocktails/{{cocktail.idDrink}}"
+    ><div class="cocktailCard card m-3 customCard" style="width: 18rem">
+      <img
+        class="card-img-top"
+        src="{{cocktail.strDrinkThumb}}"
+        alt="Card image cap"
+      />
+      <div class="cocktailCard card-body">
+        <h5 class="cocktailTitle card-title">
+          <i class="fa-solid fa-star"></i>&nbsp;{{cocktail.strDrink}}
+        </h5>
+      </div>
+    </div>
+  </a>
+  {% endfor %}
+</div>
+{% endblock %}
