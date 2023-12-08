@@ -1,8 +1,11 @@
 from flask import Flask, render_template, request, flash, redirect, session, g, jsonify
-from models import db, connect_db, User
+from models import db, connect_db, User, UserFeedback, Comments
 from forms import NewUserForm, LoginUserForm
 import requests
 from secret import apiKey
+from sqlalchemy.orm.exc import NoResultFound
+import json
+from datetime import datetime
 
 CURR_USER_ID = "curr_user"
 
@@ -18,6 +21,9 @@ app.config["SECRET_KEY"] = "password123"
 
 
 connect_db(app)
+
+with app.app_context():
+    db.create_all()
 
 base_api = f"https://www.thecocktaildb.com/api/json/v2/{apiKey}"
 
@@ -55,6 +61,8 @@ app.context_processor(user_data)
 
 @app.route("/")
 def show_home():
+    if g.user:
+        print(g.user.userFeedback)
     return render_template("home.html")
 
 
@@ -63,11 +71,10 @@ def search():
     query = request.args.get("query", "")
     resp = requests.get(base_api + f"/search.php?s={query}")
     result = requests.get(base_api + f"/search.php?i={query}")
-    # return resp.text
     return [resp.text, result.text]
 
 
-@app.route("/signup", methods=["GET", "POST"])
+@app.route("/user/signup", methods=["GET", "POST"])
 def user_signup():
     if g.user:
         flash("A user is already logged in.", "danger")
@@ -89,7 +96,7 @@ def user_signup():
     return render_template("/user/signup.html", form=form)
 
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route("/user/login", methods=["GET", "POST"])
 def user_login():
     if g.user:
         flash("A user is already logged in.", "danger")
@@ -110,7 +117,7 @@ def user_login():
     return render_template("user/login.html", form=form)
 
 
-@app.route("/logout")
+@app.route("/user/logout")
 def logout():
     """Handle logout of user."""
     if session[CURR_USER_ID]:
@@ -123,9 +130,16 @@ def logout():
 
 @app.route("/cocktails")
 def list_cocktails():
+    user = None
+    favorites = None
     response = requests.get(base_api + "/popular.php")
     data = response.json()
-    return render_template("cocktails.html", cocktails=data["drinks"])
+    if g.user:
+        user = g.user
+        favorites = user.favorites()
+    return render_template(
+        "cocktails.html", cocktails=data["drinks"], user=user, favorites=favorites
+    )
 
 
 @app.route("/cocktails/<int:id>")
@@ -146,8 +160,33 @@ def show_cocktail_detail(id):
         ".", ".<br>"
     )
 
+    if g.user:
+        try:
+            feedback = UserFeedback.query.filter(
+                UserFeedback.user_id == g.user.id, UserFeedback.cocktail_id == id
+            ).one()
+        except NoResultFound:
+            feedback = None
+    else:
+        feedback = None
+    likes = len(
+        UserFeedback.query.filter(
+            UserFeedback.cocktail_id == id, UserFeedback.like_boolean == True
+        ).all()
+    )
+    dislikes = len(
+        UserFeedback.query.filter(
+            UserFeedback.cocktail_id == id, UserFeedback.like_boolean == False
+        ).all()
+    )
     return render_template(
-        "cocktail.html", cocktail=cocktail[0], ingredients=ingredients
+        "cocktail.html",
+        cocktail=cocktail[0],
+        ingredients=ingredients,
+        user=g.user,
+        feedback=feedback,
+        likes=likes,
+        dislikes=dislikes,
     )
 
 
@@ -164,3 +203,114 @@ def list_ingredients(ingredient):
         ingredient=ingredientJson["ingredients"][0],
         cocktails=cocktails["drinks"],
     )
+
+
+@app.route("/user/favorite/<int:id>", methods=["POST"])
+def add_favorite(id):
+    if not g.user:
+        flash("Not Authorized to perform this action", "danger")
+        return redirect(f"/cocktails/{id}")
+    try:
+        feedback = UserFeedback.query.filter(
+            UserFeedback.cocktail_id == id, UserFeedback.user_id == g.user.id
+        ).one()
+        print(feedback)
+    except NoResultFound:
+        feedback = None
+    if feedback == None:
+        new_feedback = UserFeedback(
+            user_id=g.user.id, cocktail_id=id, favorite_boolean=True
+        )
+        db.session.add(new_feedback)
+        db.session.commit()
+    elif feedback.favorite_boolean == True:
+        feedback.favorite_boolean = False
+    else:
+        feedback.favorite_boolean = True
+    db.session.commit()
+    return redirect(f"/cocktails/{id}")
+
+
+@app.route("/user/favorites")
+def list_favorites():
+    if not g.user:
+        flash("Not Authorized to perform this action", "danger")
+        return redirect("/")
+    favorites = []
+    for favorite_id in g.user.favorites():
+        resp = requests.get(base_api + f"/lookup.php?i={favorite_id}")
+        json_data = resp.json()
+        favorites.append(json_data["drinks"][0])
+    print(g.user.favorites())
+    return render_template(
+        "/user/favorites.html",
+        user=g.user,
+        cocktails=favorites,
+        favorites=g.user.favorites(),
+    )
+
+
+@app.route("/user/like/<int:id>", methods=["POST"])
+def add_like(id):
+    if not g.user:
+        flash("Not Authorized to perform this action", "danger")
+        return redirect(f"/cocktails/{id}")
+    try:
+        feedback = UserFeedback.query.filter(
+            UserFeedback.cocktail_id == id, UserFeedback.user_id == g.user.id
+        ).one()
+    except NoResultFound:
+        feedback = None
+    if feedback == None:
+        new_feedback = UserFeedback(
+            user_id=g.user.id, cocktail_id=id, favorite_boolean=False, like_boolean=True
+        )
+        db.session.add(new_feedback)
+        db.session.commit()
+    elif feedback.like_boolean == True:
+        feedback.like_boolean = None
+    else:
+        feedback.like_boolean = True
+    db.session.commit()
+
+    return redirect(f"/cocktails/{id}")
+
+
+@app.route("/user/dislike/<int:id>", methods=["POST"])
+def add_dislike(id):
+    if not g.user:
+        flash("Not Authorized to perform this action", "danger")
+        return redirect("/")
+    try:
+        feedback = UserFeedback.query.filter(
+            UserFeedback.cocktail_id == id, UserFeedback.user_id == g.user.id
+        ).one()
+    except NoResultFound:
+        feedback = None
+    if feedback == None:
+        new_feedback = UserFeedback(
+            user_id=g.user.id,
+            cocktail_id=id,
+            favorite_boolean=False,
+            like_boolean=False,
+        )
+        db.session.add(new_feedback)
+        db.session.commit()
+    elif feedback.like_boolean == False:
+        feedback.like_boolean = None
+    else:
+        feedback.like_boolean = False
+    db.session.commit()
+
+    return redirect(f"/cocktails/{id}")
+
+
+# @app.route("/cocktails/addcomment/<int:cocktail_id>", methods=["POST"])
+# def add_comment(cocktail_id):
+#     if not g.user:
+#         flash("Not Authorized to perform this action", "danger")
+#         return redirect(f"/cocktails/{cocktail_id}")
+#     data = request.data
+#     print(data)
+#     comment = Comments(cocktail_id)
+#     return redirect(f"/cocktails/{id}")
