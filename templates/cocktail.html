@@ -6,6 +6,50 @@
   src="{{cocktail.strDrinkThumb}}"
   alt="Picture of {{cocktail.strDrink}}"
 />
+{% if user %}
+<div class="reactionContainer container">
+  <form
+    class="reactionForm"
+    action="/user/like/{{cocktail.idDrink}}"
+    method="POST"
+  >
+    <label class="mx-2" for="likes">{{likes}}</label
+    ><button class="reactionButton" id="likes" type="submit">
+      {% if feedback.like_boolean == True %}
+      <i class="fa-solid fa-thumbs-up"></i> {% else %}
+      <i class="fa-regular fa-thumbs-up"></i>
+      {% endif %}
+    </button>
+  </form>
+  <form
+    class="reactionForm"
+    action="/user/favorite/{{cocktail.idDrink}}"
+    method="POST"
+  >
+    <button class="reactionButton" id="likes" type="submit">
+      {% if feedback.favorite_boolean == True %}
+      <i class="fa-solid fa-star"></i>
+      {% else %}
+      <i class="fa-regular fa-star"></i>
+      {% endif %}
+    </button>
+  </form>
+  <form
+    class="reactionForm"
+    action="/user/dislike/{{cocktail.idDrink}}"
+    method="POST"
+  >
+    <button class="reactionButton" id="dislikes" type="submit">
+      {% if feedback.like_boolean == False %}
+      <i class="fa-solid fa-thumbs-down"></i>
+      {% else %}
+      <i class="fa-regular fa-thumbs-down"></i>
+      {% endif %}
+    </button>
+    <label class="mx-1" for="dislikes">{{dislikes}}</label>
+  </form>
+</div>
+{% endif %}
 <h2 class="mt-5 display-3 text-center">Ingredients</h2>
 <div class="mt-5 container d-flex justify-content-evenly flex-wrap">
   {% for ingredient, measure in ingredients.items() %}
@@ -27,9 +71,15 @@
     {{cocktail.strInstructions | safe}}
   </p>
 </div>
+<h2 class="m-5 display-3 text-center">Comments</h2>
 <div class="cocktailComments container">
+  <form action="/cocktails/addcomment/{{cocktail.idDrink}}" method="POST">
+    <div class="form-group">
+      <label for="commentInput">Add a comment!</label>
+      <input class="form-input" id="commentInput" type="text" />
+    </div>
+  </form>
   {% for comment in comments %}
-  <h2 class="m-3 display-3 text-center">Comments</h2>
   <div class="card">
     <h5 class="card-title">{{comment.user.username}}</h5>
     <p class="card-text">{{comment.comment}}</p>
