@@ -27,6 +27,13 @@ class User(db.Model):
     def __repr__(self):
         return f"<User #{self.id}: {self.username}>"
 
+    def favorites(self):
+        return [
+            str(cocktail.cocktail_id)
+            for cocktail in self.userFeedback
+            if cocktail.favorite_boolean == True
+        ]
+
     @classmethod
     def signup(cls, username, password, email):
         """Sign up user.
@@ -67,10 +74,25 @@ class Comments(db.Model):
 
 
 class UserFeedback(db.Model):
-    __tablename__ = "userFeedback"
+    __tablename__ = "userfeedback"
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     cocktail_id = db.Column(db.Integer, nullable=False)
     like_boolean = db.Column(db.Boolean)
-    favorited = db.Column(db.Boolean, nullable=False)
+    favorite_boolean = db.Column(db.Boolean, nullable=False)
+
+    def __repr__(self):
+        return f"<UserFeedback #{self.id} user:{self.user_id}  cocktail:{self.cocktail_id}>"
+
+    @classmethod
+    def add_favorite(cls, user_id, cocktail_id):
+        feedback = UserFeedback(
+            user_id=user_id, cocktail_id=cocktail_id, like_boolean=True, favortied=True
+        )
+        db.session.add(feedback)
+        return feedback
+
+    @classmethod
+    def remove_favorite(cls, user_id, cocktail_id):
+        return UserFeedback.query.filter(user_id=user_id, cocktail_id=cocktail_id)
