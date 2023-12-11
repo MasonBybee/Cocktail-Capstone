@@ -75,6 +75,7 @@
   </p>
 </div>
 <h2 class="m-5 display-3 text-center">Comments</h2>
+{% if user.id %}
 <form
   name="addNewComment"
   action="/cocktails/addcomment/{{cocktail.idDrink}}"
@@ -92,6 +93,11 @@
     <button class="btn commentBtn">Submit</button>
   </div>
 </form>
+{% else %}
+<span class="loginToComment"
+  >Login &nbsp;<a href="/user/login">HERE</a> to create a comment!</span
+>
+{% endif %}
 <div class="cocktailComments">
   {% for comment in comments %}
   <div class="m-3 card commentCard">
