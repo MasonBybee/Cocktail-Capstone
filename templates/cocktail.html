@@ -9,6 +9,7 @@
 {% if user %}
 <div class="reactionContainer container">
   <form
+    name="like{{cocktail.idDrink}}"
     class="reactionForm"
     action="/user/like/{{cocktail.idDrink}}"
     method="POST"
@@ -22,6 +23,7 @@
     </button>
   </form>
   <form
+    name="favorite{{cocktail.idDrink}}"
     class="reactionForm"
     action="/user/favorite/{{cocktail.idDrink}}"
     method="POST"
@@ -35,6 +37,7 @@
     </button>
   </form>
   <form
+    name="dislike{{cocktail.idDrink}}"
     class="reactionForm"
     action="/user/dislike/{{cocktail.idDrink}}"
     method="POST"
@@ -72,17 +75,45 @@
   </p>
 </div>
 <h2 class="m-5 display-3 text-center">Comments</h2>
-<div class="cocktailComments container">
-  <form action="/cocktails/addcomment/{{cocktail.idDrink}}" method="POST">
-    <div class="form-group">
-      <label for="commentInput">Add a comment!</label>
-      <input class="form-input" id="commentInput" type="text" />
-    </div>
-  </form>
+<form
+  name="addNewComment"
+  action="/cocktails/addcomment/{{cocktail.idDrink}}"
+  method="POST"
+>
+  <div class="form-group commentInputContainer">
+    <label class="commentLabel" for="commentInput">Add a comment!</label>
+    <textarea
+      name="commentInput"
+      class="form-input commentInput"
+      id="commentInput"
+      rows="3"
+      maxlength="250"
+    ></textarea>
+    <button class="btn commentBtn">Submit</button>
+  </div>
+</form>
+<div class="cocktailComments">
   {% for comment in comments %}
-  <div class="card">
-    <h5 class="card-title">{{comment.user.username}}</h5>
-    <p class="card-text">{{comment.comment}}</p>
+  <div class="m-3 card commentCard">
+    <h5 class="card-title commentTitle">
+      @{{comment.user.username}}&nbsp;<sub class="CommentDateCreated"
+        >{{comment.dateCreated.split(' ')[0]}}</sub
+      >
+    </h5>
+    <p id="p{{comment.id}}" class="card-text commentBody">
+      {{comment.comment}}
+    </p>
+    {% if user.id == comment.user_id%}
+    <form
+      name="delete{{comment.id}}"
+      action="/cocktails/deletecomment/{{comment.id}}"
+      method="POST"
+      class="deleteBtn"
+    >
+      <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+    </form>
+
+    {% endif %}
   </div>
   {% endfor %}
 </div>
