@@ -4,14 +4,15 @@ content %}
 <h1 class="display-4 text-center mt-5">Login!</h1>
 
 <div class="container d-flex justify-content-center mt-3">
-  <form method="POST" class="">
+  <form name="login" method="POST">
     {{ form.hidden_tag() }} {% for field in form if field.widget.input_type
     !='hidden' %}
     <div class="form-group"></div>
     {% for error in field.errors %}
     <span class="text-danger">{{ error }}</span>
-    {% endfor %} {{ field(placeholder=field.label.text, class="form-control
-    my-3") }} {% endfor %}
+    {% endfor %} {{
+    field(placeholder=field.label.text,autocomplete="current-password",
+    class="form-control my-3") }} {% endfor %}
 
     <button class="btn custom-btn btn-primary mt-3">Login!</button>
   </form>
