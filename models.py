@@ -84,15 +84,3 @@ class UserFeedback(db.Model):
 
     def __repr__(self):
         return f"<UserFeedback #{self.id} user:{self.user_id}  cocktail:{self.cocktail_id}>"
-
-    @classmethod
-    def add_favorite(cls, user_id, cocktail_id):
-        feedback = UserFeedback(
-            user_id=user_id, cocktail_id=cocktail_id, like_boolean=True, favortied=True
-        )
-        db.session.add(feedback)
-        return feedback
-
-    @classmethod
-    def remove_favorite(cls, user_id, cocktail_id):
-        return UserFeedback.query.filter(user_id=user_id, cocktail_id=cocktail_id)
