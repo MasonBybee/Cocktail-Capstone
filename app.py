@@ -11,18 +11,19 @@ from dotenv import load_dotenv
 
 load_dotenv()
 apiKey = os.getenv("apiKey")
+DATABASE_URL = os.getenv("DATABASE_URL")
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 CURR_USER_ID = "curr_user"
 
 app = Flask(__name__)
 
 
-# app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///cocktaildb"
-# # app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///cocktaildb_test"
+app.config["SQLALCHEMY_DATABASE_URI"] = f"{DATABASE_URL}"
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = False
-# app.config["SECRET_KEY"] = "password123"
+app.config["SECRET_KEY"] = f"{SECRET_KEY}"
 
 
 connect_db(app)
