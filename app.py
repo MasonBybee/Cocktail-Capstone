@@ -17,12 +17,12 @@ CURR_USER_ID = "curr_user"
 app = Flask(__name__)
 
 
-app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///cocktaildb"
-# app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///cocktaildb_test"
+# app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///cocktaildb"
+# # app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql:///cocktaildb_test"
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SQLALCHEMY_ECHO"] = False
-app.config["SECRET_KEY"] = "password123"
+# app.config["SECRET_KEY"] = "password123"
 
 
 connect_db(app)
