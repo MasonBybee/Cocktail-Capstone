@@ -27,9 +27,6 @@ app.config["SECRET_KEY"] = "password123"
 
 connect_db(app)
 
-with app.app_context():
-    db.create_all()
-
 base_api = f"https://www.thecocktaildb.com/api/json/v2/{apiKey}"
 
 
@@ -66,11 +63,15 @@ app.context_processor(user_data)
 
 @app.route("/")
 def show_home():
+    """Shows landing page"""
     return render_template("home.html")
 
 
 @app.route("/search", methods=["GET"])
 def search():
+    """Helper function for homepage Search
+    Searches API for cocktails and ingredients matching the args given
+    """
     query = request.args.get("query", "")
     resp = requests.get(base_api + f"/search.php?s={query}")
     result = requests.get(base_api + f"/search.php?i={query}")
@@ -79,6 +80,7 @@ def search():
 
 @app.route("/user/signup", methods=["GET", "POST"])
 def user_signup():
+    """Shows signup page/Handles user signup"""
     if g.user:
         flash("A user is already logged in.", "danger")
         return redirect("/")
@@ -101,6 +103,7 @@ def user_signup():
 
 @app.route("/user/login", methods=["GET", "POST"])
 def user_login():
+    """Shows login page/Handles user login"""
     if g.user:
         flash("A user is already logged in.", "danger")
         return redirect("/")
@@ -133,6 +136,7 @@ def logout():
 
 @app.route("/cocktails")
 def list_cocktails():
+    """Shows list of popular cocktails"""
     user = None
     favorites = None
     response = requests.get(base_api + "/popular.php")
@@ -147,6 +151,7 @@ def list_cocktails():
 
 @app.route("/cocktails/<int:id>")
 def show_cocktail_detail(id):
+    """Shows the detail page for cocktail of id"""
     response = requests.get(base_api + f"/lookup.php?i={id}")
     data = response.json()
     cocktail = data["drinks"]
@@ -195,6 +200,7 @@ def show_cocktail_detail(id):
 
 @app.route("/ingredients/<ingredient>")
 def list_ingredients(ingredient):
+    """Shows detail page for ingredient"""
     response = requests.get(base_api + f"/search.php?i={ingredient}")
     ingredientJson = response.json()
 
@@ -210,6 +216,7 @@ def list_ingredients(ingredient):
 
 @app.route("/user/favorite/<int:id>", methods=["POST"])
 def add_favorite(id):
+    """Creates/Edits user feedback to add or remove a favorite for cocktail of id"""
     if not g.user:
         flash("Not Authorized to perform this action", "danger")
         return redirect(f"/cocktails/{id}")
@@ -236,6 +243,7 @@ def add_favorite(id):
 
 @app.route("/user/favorites")
 def list_favorites():
+    """Views users favorite cocktails"""
     if not g.user:
         flash("Not Authorized to perform this action", "danger")
         return redirect("/")
@@ -255,6 +263,7 @@ def list_favorites():
 
 @app.route("/user/like/<int:id>", methods=["POST"])
 def add_like(id):
+    """Creates/Edits user feedback to add or remove a like for cocktail of id"""
     if not g.user:
         flash("Not Authorized to perform this action", "danger")
         return redirect(f"/cocktails/{id}")
@@ -281,6 +290,7 @@ def add_like(id):
 
 @app.route("/user/dislike/<int:id>", methods=["POST"])
 def add_dislike(id):
+    """Creates/Edits user feedback to add or remove a dislike for cocktail of id"""
     if not g.user:
         flash("Not Authorized to perform this action", "danger")
         return redirect("/")
@@ -310,6 +320,7 @@ def add_dislike(id):
 
 @app.route("/cocktails/addcomment/<int:cocktail_id>", methods=["POST"])
 def add_comment(cocktail_id):
+    """Adds a comment from user for cocktail_id"""
     if not g.user:
         flash("Not Authorized to perform this action", "danger")
         return redirect(f"/cocktails/{cocktail_id}")
@@ -334,6 +345,7 @@ def add_comment(cocktail_id):
 
 @app.route("/cocktails/deletecomment/<int:comment_id>", methods=["POST"])
 def delete_comment(comment_id):
+    """Deletes comment of comment_id"""
     comment = Comments.query.filter(Comments.id == comment_id).one()
     if not g.user:
         flash("Not Authorized to perform this action", "danger")
