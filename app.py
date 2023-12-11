@@ -66,8 +66,6 @@ app.context_processor(user_data)
 
 @app.route("/")
 def show_home():
-    if g.user:
-        print(g.user.userFeedback)
     return render_template("home.html")
 
 
@@ -174,18 +172,18 @@ def show_cocktail_detail(id):
             feedback = None
     else:
         feedback = None
+    all_feedback = UserFeedback.query.filter(UserFeedback.cocktail_id == id).all()
     likes = len(
-        UserFeedback.query.filter(
-            UserFeedback.cocktail_id == id, UserFeedback.like_boolean == True
-        ).all()
+        [feedback for feedback in all_feedback if feedback.like_boolean == True]
     )
     dislikes = len(
-        UserFeedback.query.filter(
-            UserFeedback.cocktail_id == id, UserFeedback.like_boolean == False
-        ).all()
+        [feedback for feedback in all_feedback if feedback.like_boolean == False]
     )
+    comments = Comments.query.filter(Comments.cocktail_id == id).all()
+
     return render_template(
         "cocktail.html",
+        comments=comments,
         cocktail=cocktail[0],
         ingredients=ingredients,
         user=g.user,
@@ -310,12 +308,36 @@ def add_dislike(id):
     return redirect(f"/cocktails/{id}")
 
 
-# @app.route("/cocktails/addcomment/<int:cocktail_id>", methods=["POST"])
-# def add_comment(cocktail_id):
-#     if not g.user:
-#         flash("Not Authorized to perform this action", "danger")
-#         return redirect(f"/cocktails/{cocktail_id}")
-#     data = request.data
-#     print(data)
-#     comment = Comments(cocktail_id)
-#     return redirect(f"/cocktails/{id}")
+@app.route("/cocktails/addcomment/<int:cocktail_id>", methods=["POST"])
+def add_comment(cocktail_id):
+    if not g.user:
+        flash("Not Authorized to perform this action", "danger")
+        return redirect(f"/cocktails/{cocktail_id}")
+    data = request.form.get("commentInput")
+    if len(data.strip()) == 0:
+        flash("Invalid comment, must contain text", "danger")
+        return redirect(f"/cocktails/{cocktail_id}")
+    now = datetime.now()
+    time = now.strftime("%m/%d/%Y %H:%M:%S")
+    comment = Comments(
+        comment=data,
+        cocktail_id=cocktail_id,
+        user_id=g.user.id,
+        dateCreated=time,
+        dateUpdated=time,
+    )
+    db.session.add(comment)
+    db.session.commit()
+
+    return redirect(f"/cocktails/{cocktail_id}")
+
+
+@app.route("/cocktails/deletecomment/<int:comment_id>", methods=["POST"])
+def delete_comment(comment_id):
+    comment = Comments.query.filter(Comments.id == comment_id).one()
+    if not g.user:
+        flash("Not Authorized to perform this action", "danger")
+        return redirect(f"/cocktails/{comment.cocktail_id}")
+    db.session.delete(comment)
+    db.session.commit()
+    return redirect(f"/cocktails/{comment.cocktail_id}")
